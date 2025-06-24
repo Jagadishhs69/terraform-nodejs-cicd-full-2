@@ -12,10 +12,14 @@ jobs:
   terraform-plan:
     runs-on: ubuntu-latest
     env:
-      AWS_REGION: ap-south-1
+      AWS_REGION: us-east-1
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: List directory contents
+        run: ls -la terraform
+        working-directory: .
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -31,15 +35,17 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform
 
       - name: Terraform Plan
         run: terraform plan -var="environment=${{ github.event.inputs.environment }}" -out=tfplan
+        working-directory: terraform
 
       - name: Upload Plan Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: terraform-plan
-          path: tfplan
+          path: terraform/tfplan
 
   terraform-apply:
     runs-on: ubuntu-latest
@@ -47,7 +53,7 @@ jobs:
     if: github.event.inputs.environment == 'prod'
     environment: production
     env:
-      AWS_REGION: ap-south-1
+      AWS_REGION: us-east-1
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -65,10 +71,13 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Download Plan Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download
+
+-artifact@v3
         with:
           name: terraform-plan
-          path: .
+          path: terraform
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
+        working-directory: terraform

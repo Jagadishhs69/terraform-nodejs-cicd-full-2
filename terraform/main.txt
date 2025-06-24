@@ -3,12 +3,12 @@ provider "aws" {
 }
 
 module "iam" {
-  source      = "../modules/iam"
+  source      = "./terraform/modules/iam"
   environment = var.environment
 }
 
 module "vpc" {
-  source              = "../modules/vpc"
+  source              = "./terraform/modules/vpc"
   environment         = var.environment
   vpc_cidr            = var.vpc_cidr
   public_subnet_cidrs = var.public_subnet_cidrs
@@ -16,12 +16,12 @@ module "vpc" {
 }
 
 module "s3" {
-  source      = "../modules/s3"
+  source      = "./terraform/modules/s3"
   environment = var.environment
 }
 
 module "rds" {
-  source               = "../modules/rds"
+  source               = "./terraform/modules/rds"
   environment          = var.environment
   vpc_id               = module.vpc.vpc_id
   private_subnet_ids   = module.vpc.private_subnet_ids
@@ -29,17 +29,17 @@ module "rds" {
 }
 
 module "secrets_manager" {
-  source      = "../modules/secrets_manager"
+  source      = "./terraform/modules/secrets_manager"
   environment = var.environment
 }
 
 module "ecr" {
-  source      = "../modules/ecr"
+  source      = "./terraform/modules/ecr"
   environment = var.environment
 }
 
 module "ec2" {
-  source                = "../modules/ec2"
+  source                = "./terraform/modules/ec2"
   environment           = var.environment
   vpc_id                = module.vpc.vpc_id
   public_subnet_ids     = module.vpc.public_subnet_ids
@@ -49,7 +49,7 @@ module "ec2" {
 }
 
 module "cloudwatch" {
-  source          = "../modules/cloudwatch"
+  source          = "./terraform/modules/cloudwatch"
   environment     = var.environment
   ec2_instance_id = module.ec2.instance_id
 }
