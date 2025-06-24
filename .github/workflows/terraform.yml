@@ -19,7 +19,7 @@ jobs:
 
       - name: List directory contents
         run: ls -la terraform
-        working-directory: .
+        working-directory: terraform
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
