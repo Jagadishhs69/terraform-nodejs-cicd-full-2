@@ -1,7 +1,7 @@
 resource "aws_instance" "app" {
-  ami = data.aws_ami.amazon_linux.id
+  ami           = data.aws_ami.amazon_linux.id
   instance_type = "t2.micro"
-  subnet_id = var.public_subnet_ids[0]
+  subnet_id     = var.public_subnet_ids[0]
   security_groups = [var.app_security_group_id]
   user_data = <<-EOF
               #!/bin/bash
@@ -14,15 +14,16 @@ resource "aws_instance" "app" {
               docker run -d -p 80:3000 ${var.ecr_repository_url}:latest
               EOF
   tags = {
-    Name = "${var.environment}-app-server"
+    Name        = "${var.environment}-app-server"
+    Environment = var.environment
   }
 }
 
 data "aws_ami" "amazon_linux" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
   filter {
-    name = "name"
+    name   = "name"
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
 }
