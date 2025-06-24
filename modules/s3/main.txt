@@ -1,0 +1,6 @@
+resource "aws_s3_bucket" "app" {
+  bucket = "${var.environment}-app-bucket"
+  tags = {
+    Name = "${var.environment}-app-bucket"
+  }
+}

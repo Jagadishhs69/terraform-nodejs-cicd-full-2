@@ -1,0 +1,32 @@
+resource "aws_instance" "app" {
+  ami = data.aws_ami.amazon_linux.id
+  instance_type = "t2.micro"
+  subnet_id = var.public_subnet_ids[0]
+  security_groups = [var.app_security_group_id]
+  user_data = <<-EOF
+              #!/bin/bash
+              yum update -y
+              yum install -y docker
+              service docker start
+              usermod -a -G docker ec2-user
+              aws ecr get-login-password --region ${var.aws_region} | docker login --username AWS --password-stdin ${var.ecr_repository_url}
+              docker pull ${var.ecr_repository_url}:latest
+              docker run -d -p 80:3000 ${var.ecr_repository_url}:latest
+              EOF
+  tags = {
+    Name = "${var.environment}-app-server"
+  }
+}
+
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners = ["amazon"]
+  filter {
+    name = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
+output "instance_id" {
+  value = aws_instance.app.id
+}

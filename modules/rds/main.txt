@@ -1,0 +1,22 @@
+resource "aws_db_instance" "postgres" {
+  identifier = "${var.environment}-postgres"
+  engine = "postgres"
+  engine_version = "15.4"
+  instance_class = "db.t3.micro"
+  allocated_storage = 20
+  username = "admin"
+  password = random_password.db_password.result
+  vpc_security_group_ids = [var.db_security_group_id]
+  db_subnet_group_name = aws_db_subnet_group.main.name
+  skip_final_snapshot = true
+}
+
+resource "aws_db_subnet_group" "main" {
+  name = "${var.environment}-db-subnet-group"
+  subnet_ids = var.private_subnet_ids
+}
+
+resource "random_password" "db_password" {
+  length = 16
+  special = true
+}
